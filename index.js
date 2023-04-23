@@ -3,9 +3,9 @@
   // if the user has just submitted a message
   // and so we should scroll the next message into view when received.
   let expectingMessage = false
-  function dial() {
+  function dial(address) {
     
-    const conn = new WebSocket(`ws://${location.host}/subscribe?address=0x12882312416492834798`)
+    const conn = new WebSocket(`ws://${location.host}/subscribe?address=${address}`)
 
     conn.addEventListener("close", ev => {
       appendLog(`WebSocket Disconnected code: ${ev.code}, reason: ${ev.reason}`, true)
@@ -31,11 +31,14 @@
       }
     })
   }
-  dial()
+  // dial()
 
   const messageLog = document.getElementById("message-log")
   const publishForm = document.getElementById("publish-form")
   const messageInput = document.getElementById("message-input")
+
+  const loginForm = document.getElementById("login-form")
+  const addressInput = document.getElementById("address-input")
 
   // appendLog appends the passed text to messageLog.
   function appendLog(text, error) {
@@ -51,9 +54,26 @@
   }
   appendLog("Submit a message to get started!")
 
+  // 登陆
+  loginForm.onsubmit = async ev => {
+    ev.preventDefault()
+
+    const address = addressInput.value
+    if (address === "") {
+      return
+    }
+    dial(address)
+    addressInput.value = address
+  }
+
   // onsubmit publishes the message from the user when the form is submitted.
   publishForm.onsubmit = async ev => {
     ev.preventDefault()
+
+    const address = addressInput.value
+    if (address === "") {
+      return
+    }
 
     const msg = messageInput.value
     if (msg === "") {
